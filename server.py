@@ -1,9 +1,7 @@
 import numpy as np
 from flask import Flask, render_template, request, redirect, flash, url_for, send_file
-from scripts.core import encrypt as p_encrypt
+from scripts.core import encrypt
 
-# Name of folder where uploaded images are stored
-UPLOAD_FOLDER = "uploads"
 # Allowed file extensions (images only)
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "tif"}
 
@@ -14,7 +12,6 @@ app.config["SESSION TYPE"] = "filesystem"
 
 @app.route("/", methods=["GET"])
 def index():
-    global uploaded_image
     return render_template("index.html")
 
 
@@ -37,37 +34,12 @@ def upload():
         ):
             flash("Please select a valid image format.", "error")
             return redirect(url_for("index"))
-        # Global variable to keep image
-        global uploaded_image
         # Converting to NumPy array
         img_array = np.frombuffer(file.read(), np.int8)
-        # Updating global variable
-        uploaded_image = img_array
-        flash('Loaded image file "' + filename + '".', "success")
-        # Save the file to the uploads folder
-        # file.save(
-        #     os.path.join(
-        #         os.path.dirname(__file__),
-        #         UPLOAD_FOLDER,
-        #         # Extracting file extension to save
-        #         ("uploaded_image" + os.path.splitext(file.filename)[1]),
-        #     )
-        # )
-    return render_template("index.html")
-
-
-# Encrypt image
-@app.route("/encrypt", methods=["GET"])
-def encrypt():
-    try:
-        uploaded_image
-    except NameError:
-        flash("Please upload an image first.", "error")
-        return redirect(url_for("index"))
-    else:
-        p_encrypt(uploaded_image)
-        return send_file("output/encrypted_image.jpg", as_attachment=True)
-        # return render_template("index.html")
+        # Encrypting image
+        encrypted_image = encrypt(img_array)
+        # Sending image file to user
+        return send_file(encrypted_image, as_attachment=True, mimetype="image/jpg", download_name="encrypted_image.jpg")
 
 
 if __name__ == "__main__":

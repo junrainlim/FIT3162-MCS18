@@ -1,9 +1,11 @@
 import cv2 as cv
 import numpy as np
 import hashlib
+import io
 
 
-def main(image_file):
+def encrypt(image_file):
+    assert image_file is not None, "Image not found or unable to load."
     # Read the image file
     img = cv.imdecode(image_file, cv.IMREAD_UNCHANGED)
 
@@ -78,15 +80,7 @@ def main(image_file):
     ]
     img_scrambled = cv.vconcat(rows)
 
-    # Save the image as a jpeg
-    cv.imwrite("output/encrypted_image.jpg", img_scrambled, [cv.IMWRITE_JPEG_QUALITY, 100])
-
-    # Display the scrambled image
-    # cv.imshow("Display Window", img_scrambled)
-    # cv.waitKey(0)
-    # cv.destroyAllWindows()
-
-
-def encrypt(img):
-    assert img is not None, "Image not found or unable to load."
-    main(img)
+    # Converting image to bytes for downloading
+    img_bytes = io.BytesIO(cv.imencode(".jpg", img_scrambled)[1])
+    img_bytes.seek(0)
+    return img_bytes

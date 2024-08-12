@@ -28,24 +28,23 @@
         {% endif %}
       {% endwith %}
       <h3>Encryption</h3>
-      <h4>Step 1: Upload an image</h4>
-      <p>Press the "Browse..." button below to select an image you want to encrypt, then press "Upload".</p>
+      <p>Press the "Browse..." button below to select an image you want to encrypt, then press "Encrypt". Your download should start shortly after.</p>
       <div class="input-group mb-3">
         <form method="post" action="upload" enctype="multipart/form-data">
           <input type="file" class="form-control-file" name="file">
-          <input type="submit" class="btn btn-primary" value="Upload">
+          <input type="submit" class="btn btn-primary" value="Encrypt">
         </form>
 
         <!-- <input type="file" class="form-control" id="inputGroupFile02" />
         <label class="input-group-text" for="inputGroupFile02">Upload</label> -->
       </div>      
-      
+<!--       
       <p>Selected file: {{ uploaded_image }}</p>
       <h4>Step 2: Encrypt</h4>
       <p>After uploading, press the button below to encrypt and download the image.</p>
       <form method="get" action="encrypt">
         <input class="btn btn-primary" type="submit" value="Encrypt + Download" name="Encrypt" />
-      </form>
+      </form> -->
     </div>
   </body>
 </html>
