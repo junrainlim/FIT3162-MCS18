@@ -2,49 +2,92 @@
 <html lang="en" data-bs-theme="dark">
   <head>
     <title>Image Encryptor/Decryptor</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen" />
   </head>
   <body>
+    <script>
+      // Displays an error message in the HTML element.
+      const showError = (error) => {
+        var errorDisplay = document.getElementById("error-display");
+        errorDisplay.innerText = "Error: " + error;
+        errorDisplay.hidden = false;
+      };
+
+      // Encrypts an image and starts the file download.
+      const encrypt = async () => {
+        let data = new FormData();
+        data.append("file", document.getElementById("image-input").files[0]);
+        const response = await fetch("/encrypt", {
+          method: "POST",
+          body: data,
+        })
+          .then((response) => {
+            // Checking if the encryption was successful
+            if (!response.ok) {
+              // Extracting the response text to show as an error
+              response.text().then((text) => {
+                showError(text);
+              });
+              throw new Error();
+            }
+            console.log(response);
+            // Displaying the secret key
+            var keyText = document.getElementById("key-text");
+            keyText.value = response.headers.get("key");
+            return response.blob();
+          })
+          .then((blob) => {
+            // Temporarily creating an element to download the image
+            let tempUrl = URL.createObjectURL(blob);
+            const aTag = document.createElement("a");
+            aTag.href = tempUrl;
+            aTag.download = tempUrl.replace(/^.*[\\/]/, "") + ".jpg";
+            document.body.appendChild(aTag);
+            aTag.click();
+            URL.revokeObjectURL(tempUrl);
+            aTag.remove();
+            // Hiding error display
+            var errorDisplay = document.getElementById("error-display");
+            errorDisplay.hidden = true;
+          })
+          .catch((error) => {});
+      };
+
+      // Copies the content of the key text box into the user's clipboard.
+      const copyKey = () => {
+        var keyText = document.getElementById("key-text");
+        keyText.select();
+        keyText.setSelectionRange(0, 99999);
+
+        navigator.clipboard.writeText(keyText.value);
+      };
+    </script>
+
     <div class="container">
       <h1 class="bd-title">Image Encryptor/Decryptor</h1>
-      <hr>
-      {% with errors = get_flashed_messages(category_filter=["error"]) %}
-        {% if errors %}
-          <div class="alert alert-danger">
-            {% for error in errors %}
-              Error: {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
-      {% with successes = get_flashed_messages(category_filter=["success"]) %}
-        {% if successes %}
-          <div class="alert alert-success">
-            {% for success in successes %}
-              Success: {{ success }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
+      <hr />
+      <p class="alert alert-danger" hidden="true" id="error-display"></p>
       <h3>Encryption</h3>
-      <p>Press the "Browse..." button below to select an image you want to encrypt, then press "Encrypt". Your download should start shortly after.</p>
-      <div class="input-group mb-3">
-        <form method="post" action="upload" enctype="multipart/form-data">
-          <input type="file" class="form-control-file" name="file">
-          <input type="submit" class="btn btn-primary" value="Encrypt">
-        </form>
-
-        <!-- <input type="file" class="form-control" id="inputGroupFile02" />
-        <label class="input-group-text" for="inputGroupFile02">Upload</label> -->
-      </div>      
-<!--       
-      <p>Selected file: {{ uploaded_image }}</p>
-      <h4>Step 2: Encrypt</h4>
-      <p>After uploading, press the button below to encrypt and download the image.</p>
-      <form method="get" action="encrypt">
-        <input class="btn btn-primary" type="submit" value="Encrypt + Download" name="Encrypt" />
-      </form> -->
+      <p>
+        Step 1: Press the "Browse..." button below to select an image you want
+        to encrypt, then press "Encrypt". Your download should start shortly
+        after.
+      </p>
+      <input
+        type="file"
+        accept="image/*"
+        class="form-control-file"
+        name="file"
+        id="image-input"
+      />
+      <button onclick="encrypt()" class="btn btn-primary">Encrypt</button>
+      <p>
+        Step 2: After encrypting, copy the secret key below and store it in a
+        secure place. {{ key }}
+      </p>
+      <input type="password" readonly="readonly" id="key-text" />
+      <button onclick="copyKey()">Copy</button>
     </div>
   </body>
 </html>
