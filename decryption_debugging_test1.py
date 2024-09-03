@@ -156,9 +156,10 @@ img_final = cv.cvtColor(img_YCC_reconstructed, cv.COLOR_YCrCb2BGR)
 
 
 
+# Save the reconstructed image
+cv.imwrite("output/image_reconstructed.png", img_final)
 
 # Display the reconstructed image
-cv.imwrite("output/image_reconstructed.png", img_final)
 cv.imshow("Reconstructed Image", img_final)
 cv.waitKey(0)
 cv.destroyAllWindows()
