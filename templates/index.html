@@ -17,7 +17,10 @@
       // Encrypts an image and starts the file download.
       const encrypt = async () => {
         let data = new FormData();
-        data.append("file", document.getElementById("image-input").files[0]);
+        data.append(
+          "file",
+          document.getElementById("encrypt-image-input").files[0]
+        );
         const response = await fetch("/encrypt", {
           method: "POST",
           body: data,
@@ -33,7 +36,7 @@
             }
             console.log(response);
             // Displaying the secret key
-            var keyText = document.getElementById("key-text");
+            var keyText = document.getElementById("encrypt-key-output");
             keyText.value = response.headers.get("key");
             return response.blob();
           })
@@ -56,12 +59,56 @@
 
       // Copies the content of the key text box into the user's clipboard.
       const copyKey = () => {
-        var keyText = document.getElementById("key-text");
+        var keyText = document.getElementById("encrypt-key-output");
         keyText.select();
         keyText.setSelectionRange(0, 99999);
 
         navigator.clipboard.writeText(keyText.value);
       };
+
+      const decrypt = async () => {
+        let data = new FormData();
+        data.append(
+          "file",
+          document.getElementById("decrypt-image-input").files[0]
+        );
+        data.append(
+          "key",
+          document.getElementById("decrypt-key-input").value
+        );
+        const response = await fetch("/decrypt", {
+          method: "POST",
+          body: data,
+        })
+          .then((response) => {
+            // Checking if the decryption was successful
+            if (!response.ok) {
+              // Extracting the response text to show as an error
+              response.text().then((text) => {
+                showError(text);
+              });
+              throw new Error();
+            }
+            console.log(response);
+            return response.blob();
+          })
+          .then((blob) => {
+            // Temporarily creating an element to download the image
+            let tempUrl = URL.createObjectURL(blob);
+            const aTag = document.createElement("a");
+            aTag.href = tempUrl;
+            aTag.download = tempUrl.replace(/^.*[\\/]/, "") + ".jpg";
+            document.body.appendChild(aTag);
+            aTag.click();
+            URL.revokeObjectURL(tempUrl);
+            aTag.remove();
+            // Hiding error display
+            var errorDisplay = document.getElementById("error-display");
+            errorDisplay.hidden = true;
+          })
+          .catch((error) => {});
+      };
+
     </script>
 
     <div class="container">
@@ -70,7 +117,7 @@
       <p class="alert alert-danger" hidden="true" id="error-display"></p>
       <h3>Encryption</h3>
       <p>
-        Step 1: Press the "Browse..." button below to select an image you want
+        Press the "Browse..." button below to select an image you want
         to encrypt, then press "Encrypt". Your download should start shortly
         after.
       </p>
@@ -79,15 +126,31 @@
         accept="image/*"
         class="form-control-file"
         name="file"
-        id="image-input"
+        id="encrypt-image-input"
       />
       <button onclick="encrypt()" class="btn btn-primary">Encrypt</button>
       <p>
-        Step 2: After encrypting, copy the secret key below and store it in a
-        secure place. {{ key }}
+        After encrypting, copy the secret key below and store it in a
+        secure place.
       </p>
-      <input type="password" readonly="readonly" id="key-text" />
+      <input type="password" readonly="readonly" id="encrypt-key-output" />
       <button onclick="copyKey()">Copy</button>
+      <br />
+      <h3>Decryption</h3>
+      <p>
+        Press the "Browse..." button below to select an image you want
+        to decrypt, paste the secret key obtained when encrypting the image
+        into the text box on the right, then press "Decrypt". Your download should start shortly after.
+      </p>
+      <input
+        type="file"
+        accept="image/*"
+        class="form-control-file"
+        name="file"
+        id="decrypt-image-input"
+      />
+      Key:&nbsp;<input type="password" id="decrypt-key-input" />
+      <button onclick="decrypt()" class="btn btn-primary">Decrypt</button>
     </div>
   </body>
 </html>
