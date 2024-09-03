@@ -72,10 +72,7 @@
           "file",
           document.getElementById("decrypt-image-input").files[0]
         );
-        data.append(
-          "key",
-          document.getElementById("decrypt-key-input").value
-        );
+        data.append("key", document.getElementById("decrypt-key-input").value);
         const response = await fetch("/decrypt", {
           method: "POST",
           body: data,
@@ -108,49 +105,129 @@
           })
           .catch((error) => {});
       };
-
     </script>
 
     <div class="container">
       <h1 class="bd-title">Image Encryptor/Decryptor</h1>
       <hr />
       <p class="alert alert-danger" hidden="true" id="error-display"></p>
-      <h3>Encryption</h3>
-      <p>
-        Press the "Browse..." button below to select an image you want
-        to encrypt, then press "Encrypt". Your download should start shortly
-        after.
-      </p>
-      <input
-        type="file"
-        accept="image/*"
-        class="form-control-file"
-        name="file"
-        id="encrypt-image-input"
-      />
-      <button onclick="encrypt()" class="btn btn-primary">Encrypt</button>
-      <p>
-        After encrypting, copy the secret key below and store it in a
-        secure place.
-      </p>
-      <input type="password" readonly="readonly" id="encrypt-key-output" />
-      <button onclick="copyKey()">Copy</button>
-      <br />
-      <h3>Decryption</h3>
-      <p>
-        Press the "Browse..." button below to select an image you want
-        to decrypt, paste the secret key obtained when encrypting the image
-        into the text box on the right, then press "Decrypt". Your download should start shortly after.
-      </p>
-      <input
-        type="file"
-        accept="image/*"
-        class="form-control-file"
-        name="file"
-        id="decrypt-image-input"
-      />
-      Key:&nbsp;<input type="password" id="decrypt-key-input" />
-      <button onclick="decrypt()" class="btn btn-primary">Decrypt</button>
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: space-around;
+        "
+      >
+        <div style="max-width: 500px">
+          <h2>Encryption</h2>
+          <div
+            style="display: flex; flex-direction: column; justify-items: center"
+          >
+            <div style="margin: 5px">
+              <h3>Step 1</h3>
+              <p style="margin: 5px">
+                Press the "Browse..." button below to select an image you want
+                to encrypt.
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                class="form-control-file"
+                name="file"
+                id="encrypt-image-input"
+                style="margin: 5px"
+              />
+            </div>
+            <div style="margin: 5px">
+              <h3>Step 2</h3>
+              <p style="margin: 5px">
+                Press the "Encrypt" button below to download the encrypted
+                image.
+              </p>
+              <button
+                onclick="encrypt()"
+                class="btn btn-primary"
+                style="margin: 5px"
+              >
+                Encrypt
+              </button>
+            </div>
+            <div style="margin: 5px">
+              <h3>Step 3</h3>
+              <p style="margin: 5px">
+                After encrypting, copy the secret key below and store it in a
+                secure place.
+              </p>
+              <div style="margin: 5px">
+                <input
+                  type="password"
+                  readonly="readonly"
+                  id="encrypt-key-output"
+                />
+                <button onclick="copyKey()">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          style="
+            border-left: var(--bs-border-width) solid rgb(222, 226, 230);
+            opacity: 0.25;
+            height: 600px;
+            margin: 20px;
+          "
+        ></div>
+        <div style="max-width: 500px">
+          <h2>Decryption</h2>
+          <div style="display: flex; flex-direction: column">
+            <div style="margin: 5px">
+              <h3>Step 1:</h3>
+              <p style="margin: 5px">
+                Press the "Browse..." button below to select an image you want
+                to decrypt.
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                class="form-control-file"
+                name="file"
+                id="decrypt-image-input"
+                style="margin: 5px"
+              />
+            </div>
+            <div style="margin: 5px">
+              <h3>Step 2:</h3>
+              <p style="margin: 5px">
+                Paste the secret key obtained when encrypting the image into the
+                text box below.
+              </p>
+              <div style="margin: 5px">
+                Key:
+                <input
+                  type="password"
+                  id="decrypt-key-input"
+                  style="margin: 5px"
+                  placeholder="Paste your key here..."
+                />
+              </div>
+            </div>
+            <div style="margin: 5px">
+              <h3>Step 3</h3>
+              <p style="margin: 5px">
+                Press the "Decrypt" button below to download the decrypted
+                image.
+              </p>
+              <button
+                onclick="decrypt()"
+                class="btn btn-primary"
+                style="margin: 5px"
+              >
+                Decrypt
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>
