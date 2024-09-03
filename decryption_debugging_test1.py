@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-import hashlib
+import random
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -117,16 +117,23 @@ for i, block in enumerate(transformed_blocks):
     reversed_blocks.append(block)
 
 # Generate deterministic permutation for block shuffling
-def generate_deterministic_permutation(key, num_blocks):
+def generate_less_deterministic_permutation(key, num_blocks):
+    # Seed the PRNG with the key
     key_int = int.from_bytes(key, byteorder='big')
+    random.seed(key_int)
+
+    # Generate a list of indices
     indices = np.arange(num_blocks)
+
+    # Shuffle the indices with controlled randomness
     for i in range(num_blocks):
-        swap_idx = (key_int + i) % num_blocks
+        swap_idx = random.randint(0, num_blocks - 1)
         indices[i], indices[swap_idx] = indices[swap_idx], indices[i]
+
     return indices
 
 # Step 3: Reverse the Block Shuffling using key K1
-permutation = generate_deterministic_permutation(K1, num_blocks)
+permutation = generate_less_deterministic_permutation(K1, num_blocks)
 inverse_permutation = np.argsort(permutation)
 
 # Unshuffle blocks based on the inverse permutation
