@@ -5,7 +5,7 @@ import random
 import io
 import os
 
-# Block size in pixels
+# Default block size in pixels
 DEFAULT_BLOCK_SIZE = 8
 
 # Length of master key and salts used to derive additional keys from in bytes
@@ -13,11 +13,11 @@ MASTER_KEY_LENGTH = 1024
 SALT_LENGTH = 16
 
 
-def generate_keys(
+def generate_key_triplet(
     secret_key: bytes, master_key_length: int, salt_length: int
 ) -> tuple[bytes, bytes, bytes, bytes]:
     """
-    Given a secret key and the length its components used for the master key and salts in bytes, returns three keys which are derived from it.
+    Given a secret key and the lengths its components use for the master key and salts in bytes, returns three keys which are derived from it.
     """
 
     def derive_key(master_key: bytes, salt: bytes) -> bytes:
@@ -95,17 +95,7 @@ def generate_negative_positive_sequence(key: bytes, length: int) -> np.ndarray:
 
     Implementation is the same as the one for generating an inversion sequence.
     """
-    # Seed the PRNG with the key
-    random.seed(key)
-
-    # Generating array of booleans
-    negative_positive_transforms = np.zeros(length, dtype=bool)
-
-    for i in range(length):
-        # getrandbits is faster than choice
-        negative_positive_transforms[i] = bool(random.getrandbits(1))
-
-    return negative_positive_transforms
+    return generate_inversion_sequence(key, length)
 
 
 # Block transformation functions
@@ -146,7 +136,6 @@ def blocks_to_image(blocks: list[np.ndarray], width: int) -> np.ndarray:
     """
     Given a list of blocks and the width of the original image in pixels, returns a NumPy array representing the reconstructed image.
     """
-
     rows = [cv.hconcat(blocks[i : i + width]) for i in range(0, len(blocks), width)]
     return cv.vconcat(rows)
 
@@ -170,9 +159,8 @@ def apply_block_scrambling(blocks: list[np.ndarray], key: bytes) -> list[np.ndar
     # Applying block scrambling
     return [blocks[i] for i in indices]
 
-def inverse_block_scrambling(
-    blocks: list[np.ndarray], key: bytes
-) -> list[np.ndarray]:
+
+def inverse_block_scrambling(blocks: list[np.ndarray], key: bytes) -> list[np.ndarray]:
     """
     Given an list of blocks and a key, applies the inverse of randomly scrambling the position of the blocks, returning the new list.
 
@@ -180,17 +168,18 @@ def inverse_block_scrambling(
     """
     # Recovering random sequence of indices
     indices = generate_index_sequence(key, len(blocks))
-    
+
     # Obtaining inverse of permutation
     # Algorithm obtained from https://stackoverflow.com/a/25535723. Should be faster than np.argsort for arrays of length N > 1210 (which should be the case for most images)
     # inverse_indices = np.argsort(indices)
-    inverse_indices = np.zeros(len(indices) ,dtype=np.int32)
+    inverse_indices = np.zeros(len(indices), dtype=np.int32)
     i = np.arange(len(indices), dtype=np.int32)
     np.put(inverse_indices, indices, i)
-    
+
     # Reversing block scrambling
     return [blocks[i] for i in inverse_indices]
-    
+
+
 def apply_rotation_inversion(blocks: list[np.ndarray], key: bytes) -> list[np.ndarray]:
     """
     Given an list of blocks and a key, randomly rotates and inverts blocks in the array, returning the new list.
@@ -277,7 +266,7 @@ def encrypt(img: cv.Mat, block_size=DEFAULT_BLOCK_SIZE) -> tuple[io.BytesIO, str
     secret_key = os.urandom(MASTER_KEY_LENGTH + (SALT_LENGTH * 3))
 
     # Deriving individual keys for each step
-    K1, K2, K3 = generate_keys(secret_key, MASTER_KEY_LENGTH, SALT_LENGTH)
+    K1, K2, K3 = generate_key_triplet(secret_key, MASTER_KEY_LENGTH, SALT_LENGTH)
     # print("Encryption keys:\n1:", K1, "\n2:", K2, "\n3:", K3)
 
     # Convert from RGB to YCbCr
@@ -307,6 +296,7 @@ def encrypt(img: cv.Mat, block_size=DEFAULT_BLOCK_SIZE) -> tuple[io.BytesIO, str
     # Converting image to bytes for downloading
     encrypted_img_bytes = io.BytesIO(cv.imencode(".jpg", encrypted_img)[1])
     encrypted_img_bytes.seek(0)
+    
     return (encrypted_img_bytes, secret_key.hex())
 
 
@@ -316,7 +306,7 @@ def decrypt(img: cv.Mat, secret_key_hex: str, block_size=DEFAULT_BLOCK_SIZE) -> 
     """
     # Obtaining secret key and components from string
     secret_key = bytes.fromhex(secret_key_hex)
-    K1, K2, K3 = generate_keys(secret_key, MASTER_KEY_LENGTH, SALT_LENGTH)
+    K1, K2, K3 = generate_key_triplet(secret_key, MASTER_KEY_LENGTH, SALT_LENGTH)
     # print("Decryption keys:\n1:", K1, "\n2:", K2, "\n3:", K3)
 
     # Dividing image into blocks of 8x8 pixels
