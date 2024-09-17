@@ -7,6 +7,8 @@ import os
 
 # Default block size in pixels
 DEFAULT_BLOCK_SIZE = 8
+# Default compression quality (0 = worst, 100 = best)
+DEFAULT_COMPRESSION_QUALITY = 75
 
 # Length of master key and salts used to derive additional keys from in bytes
 MASTER_KEY_LENGTH = 1024
@@ -257,7 +259,11 @@ def inverse_negative_positive_transform(
     return apply_negative_positive_transform(blocks, key)
 
 
-def encrypt(img: cv.Mat, block_size=DEFAULT_BLOCK_SIZE) -> tuple[io.BytesIO, str]:
+def encrypt(
+    img: cv.Mat,
+    block_size: int = DEFAULT_BLOCK_SIZE,
+    compression_quality: int = DEFAULT_COMPRESSION_QUALITY,
+) -> tuple[io.BytesIO, str]:
     """
     Given a NumPy array representing an image, returns an encrypted version of it in bytes, and the secret key used to encrypt it as a key.
     """
@@ -293,14 +299,19 @@ def encrypt(img: cv.Mat, block_size=DEFAULT_BLOCK_SIZE) -> tuple[io.BytesIO, str
     encrypted_img = blocks_to_image(blocks, width)
     print("enrypt ", encrypted_img.shape)
 
-    # Converting image to bytes for downloading
-    encrypted_img_bytes = io.BytesIO(cv.imencode(".jpg", encrypted_img)[1])
+    # Compressing then image then converting to bytes for downloading
+    encode_parameters = [int(cv.IMWRITE_JPEG_QUALITY), compression_quality]
+    encrypted_img_bytes = io.BytesIO(
+        cv.imencode("100.jpg", encrypted_img, encode_parameters)[1]
+    )
     encrypted_img_bytes.seek(0)
-    
+
     return (encrypted_img_bytes, secret_key.hex())
 
 
-def decrypt(img: cv.Mat, secret_key_hex: str, block_size=DEFAULT_BLOCK_SIZE) -> bytes:
+def decrypt(
+    img: cv.Mat, secret_key_hex: str, block_size: int = DEFAULT_BLOCK_SIZE
+) -> bytes:
     """
     Given a NumPy array representing an image encrypted using this application, and a string of hexadecimal characters representing the secret key used to encrypt it, returns the decrypted image as bytes.
     """
