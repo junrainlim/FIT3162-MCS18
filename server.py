@@ -93,7 +93,7 @@ def route_decrypt():
                 + " pixels.",
                 422,
             )
-        if "key" not in request.form:
+        if "key" not in request.form or not request.form["key"].strip():
             return "No key provided!", 400
         key = request.form["key"]
         # Decrypting image
