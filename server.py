@@ -41,15 +41,7 @@ def route_encrypt():
         img_array = np.frombuffer(file.read(), np.int8)
         # Converting to OpenCV matrix
         img_mat = cv.imdecode(img_array, cv.IMREAD_UNCHANGED)
-        height, width, _ = img_mat.shape
-        # Checking if image width and height are multiples of block size
-        if not (width % DEFAULT_BLOCK_SIZE == 0 and height % DEFAULT_BLOCK_SIZE == 0):
-            return (
-                "Please select an image which has a width and height which are multiples of "
-                + str(DEFAULT_BLOCK_SIZE)
-                + " pixels.",
-                422,
-            )
+
         # Encrypting image
         encrypted_image_bytes, secret_key = encrypt(img_mat)
 

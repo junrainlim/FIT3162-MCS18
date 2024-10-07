@@ -15,6 +15,13 @@ MASTER_KEY_LENGTH = 1024
 SALT_LENGTH = 16
 
 
+def round_arbitrary(n: int, interval: int) -> int:
+    """
+    Helper function to round an integer to the nearest arbitrary multiple of some other integer. Used for resizing image to be multiple of block size.
+    """
+    return int(np.ceil(n / interval) * interval)
+
+
 def generate_key_triplet(
     secret_key: bytes, master_key_length: int, salt_length: int
 ) -> tuple[bytes, bytes, bytes, bytes]:
@@ -267,6 +274,15 @@ def encrypt(
     """
     Given a NumPy array representing an image, returns an encrypted version of it in bytes, and the secret key used to encrypt it as a key.
     """
+
+    height, width, _ = img.shape
+    # If image is not multiple of block size, resize it
+    if not (width % DEFAULT_BLOCK_SIZE == 0 and height % DEFAULT_BLOCK_SIZE == 0):
+        img = cv.resize(
+            img,
+            (round_arbitrary(width, block_size), round_arbitrary(height, block_size)),
+        )
+
     # Generating secret key to be used for decryption
     # Using first 1024 bytes as master key, and every 16 bytes after for salts for derived keys(sizes for both as per hashlib suggestions)
     secret_key = os.urandom(MASTER_KEY_LENGTH + (SALT_LENGTH * 3))
