@@ -6,9 +6,9 @@ import io
 import os
 
 # Default block size in pixels
-DEFAULT_BLOCK_SIZE = 8
+BLOCK_SIZE = 8
 # Default compression quality (0 = worst, 100 = best)
-DEFAULT_COMPRESSION_QUALITY = 75
+COMPRESSION_QUALITY = 75
 
 # Length of master key and salts used to derive additional keys from in bytes
 MASTER_KEY_LENGTH = 1024
@@ -268,8 +268,8 @@ def inverse_negative_positive_transform(
 
 def encrypt(
     img: cv.Mat,
-    block_size: int = DEFAULT_BLOCK_SIZE,
-    compression_quality: int = DEFAULT_COMPRESSION_QUALITY,
+    block_size: int = BLOCK_SIZE,
+    compression_quality: int = COMPRESSION_QUALITY,
 ) -> tuple[io.BytesIO, str]:
     """
     Given a NumPy array representing an image, returns an encrypted version of it in bytes, and the secret key used to encrypt it as a key.
@@ -277,7 +277,7 @@ def encrypt(
 
     height, width, _ = img.shape
     # If image is not multiple of block size, resize it
-    if not (width % DEFAULT_BLOCK_SIZE == 0 and height % DEFAULT_BLOCK_SIZE == 0):
+    if not (width % BLOCK_SIZE == 0 and height % BLOCK_SIZE == 0):
         img = cv.resize(
             img,
             (round_arbitrary(width, block_size), round_arbitrary(height, block_size)),
@@ -318,16 +318,14 @@ def encrypt(
     # Compressing then image then converting to bytes for downloading
     encode_parameters = [int(cv.IMWRITE_JPEG_QUALITY), compression_quality]
     encrypted_img_bytes = io.BytesIO(
-        cv.imencode("100.jpg", encrypted_img, encode_parameters)[1]
+        cv.imencode("encrypted_image.jpg", encrypted_img, encode_parameters)[1]
     )
     encrypted_img_bytes.seek(0)
 
     return (encrypted_img_bytes, secret_key.hex())
 
 
-def decrypt(
-    img: cv.Mat, secret_key_hex: str, block_size: int = DEFAULT_BLOCK_SIZE
-) -> bytes:
+def decrypt(img: cv.Mat, secret_key_hex: str, block_size: int = BLOCK_SIZE) -> bytes:
     """
     Given a NumPy array representing an image encrypted using this application, and a string of hexadecimal characters representing the secret key used to encrypt it, returns the decrypted image as bytes.
     """

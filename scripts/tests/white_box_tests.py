@@ -24,6 +24,7 @@ from core import (
     decrypt,
 )
 
+
 class TestCoreFunctions(unittest.TestCase):
     def setUp(self):
         self.secret_key = os.urandom(1048)  # 1024 + 3*16
@@ -43,7 +44,9 @@ class TestCoreFunctions(unittest.TestCase):
         d) What are the expected outputs: Three keys (K1, K2, K3), each of length 32 bytes.
         e) What are the actual outputs: The lengths of K1, K2, K3 are checked.
         """
-        K1, K2, K3 = generate_key_triplet(self.secret_key, self.master_key_length, self.salt_length)
+        K1, K2, K3 = generate_key_triplet(
+            self.secret_key, self.master_key_length, self.salt_length
+        )
         self.assertEqual(len(K1), 32)
         self.assertEqual(len(K2), 32)
         self.assertEqual(len(K3), 32)
@@ -104,7 +107,9 @@ class TestCoreFunctions(unittest.TestCase):
         d) What are the expected outputs: A rotated block of the same shape.
         e) What are the actual outputs: The output shape is verified against the input shape.
         """
-        block = np.random.randint(0, 256, (self.block_size, self.block_size), dtype=np.uint8)
+        block = np.random.randint(
+            0, 256, (self.block_size, self.block_size), dtype=np.uint8
+        )
         rotated_block = rotate_block(block, 1)
         self.assertEqual(rotated_block.shape, block.shape)
 
@@ -116,7 +121,9 @@ class TestCoreFunctions(unittest.TestCase):
         d) What are the expected outputs: An inverted block of the same shape.
         e) What are the actual outputs: The output shape is verified against the input shape.
         """
-        block = np.random.randint(0, 256, (self.block_size, self.block_size), dtype=np.uint8)
+        block = np.random.randint(
+            0, 256, (self.block_size, self.block_size), dtype=np.uint8
+        )
         inverted_block = invert_block(block)
         self.assertEqual(inverted_block.shape, block.shape)
 
@@ -129,7 +136,11 @@ class TestCoreFunctions(unittest.TestCase):
         e) What are the actual outputs: The length of the blocks list is compared to the expected number of blocks.
         """
         blocks = image_to_blocks(self.image, self.block_size)
-        self.assertEqual(len(blocks), (self.image.shape[0] // self.block_size) * (self.image.shape[1] // self.block_size))
+        self.assertEqual(
+            len(blocks),
+            (self.image.shape[0] // self.block_size)
+            * (self.image.shape[1] // self.block_size),
+        )
 
     def test_blocks_to_image(self):
         """
@@ -140,7 +151,9 @@ class TestCoreFunctions(unittest.TestCase):
         e) What are the actual outputs: The shape of the reconstructed image is compared to the original image shape.
         """
         blocks = image_to_blocks(self.image, self.block_size)
-        reconstructed_image = blocks_to_image(blocks, self.image.shape[1] // self.block_size)
+        reconstructed_image = blocks_to_image(
+            blocks, self.image.shape[1] // self.block_size
+        )
         self.assertEqual(reconstructed_image.shape, self.image.shape)
 
     def test_negative_positive_transform(self):
@@ -151,7 +164,9 @@ class TestCoreFunctions(unittest.TestCase):
         d) What are the expected outputs: A transformed block of the same shape.
         e) What are the actual outputs: The output shape is verified against the input shape.
         """
-        block = np.random.randint(0, 256, (self.block_size, self.block_size), dtype=np.uint8)
+        block = np.random.randint(
+            0, 256, (self.block_size, self.block_size), dtype=np.uint8
+        )
         transformed_block = negative_positive_transform(block)
         self.assertEqual(transformed_block.shape, block.shape)
 
@@ -176,7 +191,14 @@ class TestCoreFunctions(unittest.TestCase):
         """
         scrambled_blocks = apply_block_scrambling(self.blocks, self.key)
         unscrambled_blocks = inverse_block_scrambling(scrambled_blocks, self.key)
-        self.assertTrue(np.all([np.array_equal(b1, b2) for b1, b2 in zip(self.blocks, unscrambled_blocks)]))
+        self.assertTrue(
+            np.all(
+                [
+                    np.array_equal(b1, b2)
+                    for b1, b2 in zip(self.blocks, unscrambled_blocks)
+                ]
+            )
+        )
 
     def test_apply_rotation_inversion(self):
         """
@@ -221,7 +243,9 @@ class TestCoreFunctions(unittest.TestCase):
         e) What are the actual outputs: A check for equality between original and restored blocks.
         """
         transformed_blocks = apply_negative_positive_transform(self.blocks, self.key)
-        restored_blocks = inverse_negative_positive_transform(transformed_blocks, self.key)
+        restored_blocks = inverse_negative_positive_transform(
+            transformed_blocks, self.key
+        )
         self.assertEqual(len(restored_blocks), len(self.blocks))
 
     def test_encrypt_decrypt(self):
@@ -231,15 +255,16 @@ class TestCoreFunctions(unittest.TestCase):
         c) What are the inputs: A randomly generated image and a secret key.
         d) What are the expected outputs: The decrypted image should match the original image.
         e) What are the actual outputs: [Error]
-        This occurs because we compressed the image during the encryption process. 
+        This occurs because we compressed the image during the encryption process.
 
         Although we are able to restore the image to almost the same quality it is put in, there will always be some sort of loss of quality, no matter how miniscule. This phenomenon is known as generation loss. Therefore, the error can be ignored.
 
-        However, the function works regardless when being used in tandem with the others on the website. 
+        However, the function works regardless when being used in tandem with the others on the website.
         """
         encrypted_image = encrypt(self.image, self.secret_key)
         decrypted_image = decrypt(encrypted_image, self.secret_key)
         self.assertTrue(np.all(self.image == decrypted_image))
+
 
 if __name__ == "__main__":
     unittest.main()

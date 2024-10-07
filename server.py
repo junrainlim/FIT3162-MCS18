@@ -7,7 +7,7 @@ from flask import (
     request,
     send_file,
 )
-from scripts.core import DEFAULT_BLOCK_SIZE, encrypt, decrypt
+from scripts.core import BLOCK_SIZE, encrypt, decrypt
 
 # Allowed file extensions (images only)
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "tif"}
@@ -78,10 +78,10 @@ def route_decrypt():
         img_mat = cv.imdecode(img_array, cv.IMREAD_UNCHANGED)
         height, width = img_mat.shape
         # Checking if image width and height are multiples of block size
-        if not (width % DEFAULT_BLOCK_SIZE == 0 and height % DEFAULT_BLOCK_SIZE == 0):
+        if not (width % BLOCK_SIZE == 0 and height % BLOCK_SIZE == 0):
             return (
                 "Please select an image which has a width and height which are multiples of "
-                + str(DEFAULT_BLOCK_SIZE)
+                + str(BLOCK_SIZE)
                 + " pixels.",
                 422,
             )
