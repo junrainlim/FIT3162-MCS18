@@ -37,8 +37,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_generate_key_triplet(self):
         """
-        White-Box Test
-
         a) What is being tested: The key generation function to ensure it produces keys of expected lengths.
         b) How it is being tested: By calling the function with a fixed secret key and checking the length of the outputs.
         c) What are the inputs: A secret key of length 1048 bytes.
@@ -52,8 +50,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_generate_index_sequence(self):
         """
-        Black-Box Test
-
         a) What is being tested: The index sequence generation to ensure it produces a valid permutation.
         b) How it is being tested: By calling the function and checking the length and contents of the output.
         c) What are the inputs: A random key and length of 64.
@@ -66,8 +62,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_generate_rotation_sequence(self):
         """
-        Black-Box Test
-
         a) What is being tested: The rotation sequence generation to ensure it produces valid rotation indices.
         b) How it is being tested: By calling the function and checking the values of the output.
         c) What are the inputs: A random key and length of 64.
@@ -80,8 +74,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_generate_inversion_sequence(self):
         """
-        Black-Box Test
-
         a) What is being tested: The inversion sequence generation to ensure it produces valid boolean values.
         b) How it is being tested: By calling the function and checking the output.
         c) What are the inputs: A random key and length of 64.
@@ -94,8 +86,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_generate_negative_positive_sequence(self):
         """
-        Black-Box Test
-
         a) What is being tested: The negative-positive sequence generation to ensure it produces valid boolean values.
         b) How it is being tested: By calling the function and checking the output.
         c) What are the inputs: A random key and length of 64.
@@ -108,8 +98,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_rotate_block(self):
         """
-        White-Box Test
-
         a) What is being tested: The block rotation function to ensure it performs the expected transformation.
         b) How it is being tested: By calling the function with a random block and checking the output shape.
         c) What are the inputs: A randomly generated 8x8 block of pixel values.
@@ -122,8 +110,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_invert_block(self):
         """
-        White-Box Test
-
         a) What is being tested: The block inversion function to ensure it performs the expected transformation.
         b) How it is being tested: By calling the function with a random block and checking the output shape.
         c) What are the inputs: A randomly generated 8x8 block of pixel values.
@@ -136,8 +122,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_image_to_blocks(self):
         """
-        Black-Box Test
-
         a) What is being tested: The image-to-blocks function to ensure it divides the image correctly.
         b) How it is being tested: By calling the function with an image and checking the number of resulting blocks.
         c) What are the inputs: A randomly generated 64x64 RGB image.
@@ -149,8 +133,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_blocks_to_image(self):
         """
-        Black-Box Test
-
         a) What is being tested: The blocks-to-image function to ensure it reconstructs the image correctly.
         b) How it is being tested: By calling the function with blocks and checking the output image shape.
         c) What are the inputs: The blocks obtained from the `image_to_blocks` function.
@@ -163,8 +145,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_negative_positive_transform(self):
         """
-        White-Box Test
-
         a) What is being tested: The negative-positive transformation to ensure it correctly alters pixel values.
         b) How it is being tested: By calling the function with a random block and checking the output shape.
         c) What are the inputs: A randomly generated 8x8 block of pixel values.
@@ -177,8 +157,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_apply_block_scrambling(self):
         """
-        Black-Box Test
-
         a) What is being tested: The block scrambling function to ensure it scrambles blocks correctly.
         b) How it is being tested: By calling the function and checking the length of the scrambled output.
         c) What are the inputs: The list of blocks and a random key.
@@ -190,8 +168,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_inverse_block_scrambling(self):
         """
-        White-Box Test
-
         a) What is being tested: The inverse block scrambling function to ensure it correctly restores original blocks.
         b) How it is being tested: By scrambling blocks and then unsrambling them, checking for equality.
         c) What are the inputs: Scrambled blocks and the original key.
@@ -204,8 +180,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_apply_rotation_inversion(self):
         """
-        Black-Box Test
-
         a) What is being tested: The rotation and inversion application function to ensure it applies transformations.
         b) How it is being tested: By calling the function and checking the length of the output.
         c) What are the inputs: The list of blocks and a random key.
@@ -217,8 +191,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_inverse_rotation_inversion(self):
         """
-        White-Box Test
-
         a) What is being tested: The inverse of rotation and inversion application to ensure original blocks are restored.
         b) How it is being tested: By applying the inverse function to rotated-inverted blocks and checking for equality.
         c) What are the inputs: Rotated-inverted blocks and the original key.
@@ -231,8 +203,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_apply_negative_positive_transform(self):
         """
-        Black-Box Test
-
         a) What is being tested: The negative-positive transformation application to ensure it alters blocks correctly.
         b) How it is being tested: By calling the function and checking the length of the output.
         c) What are the inputs: The list of blocks and a random key.
@@ -244,8 +214,6 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_inverse_negative_positive_transform(self):
         """
-        White-Box Test
-
         a) What is being tested: The inverse negative-positive transformation to ensure it restores original blocks.
         b) How it is being tested: By applying the inverse function to transformed blocks and checking for equality.
         c) What are the inputs: Transformed blocks and the original key.
@@ -258,13 +226,16 @@ class TestCoreFunctions(unittest.TestCase):
 
     def test_encrypt_decrypt(self):
         """
-        Black-Box Test
-
         a) What is being tested: The encryption and decryption process to ensure they work correctly together.
         b) How it is being tested: By encrypting an image and then decrypting it to check for equality with the original.
         c) What are the inputs: A randomly generated image and a secret key.
         d) What are the expected outputs: The decrypted image should match the original image.
-        e) What are the actual outputs: 
+        e) What are the actual outputs: [Error]
+        This occurs because we compressed the image during the encryption process. 
+
+        Although we are able to restore the image to almost the same quality it is put in, there will always be some sort of loss of quality, no matter how miniscule. This phenomenon is known as generation loss. Therefore, the error can be ignored.
+
+        However, the function works regardless when being used in tandem with the others on the website. 
         """
         encrypted_image = encrypt(self.image, self.secret_key)
         decrypted_image = decrypt(encrypted_image, self.secret_key)

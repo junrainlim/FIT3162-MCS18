@@ -97,7 +97,10 @@ def route_decrypt():
             return "No key provided!", 400
         key = request.form["key"]
         # Decrypting image
-        decrypted_image_bytes = decrypt(img_mat, key)
+        try:
+            decrypted_image_bytes = decrypt(img_mat, key)
+        except ValueError:
+            return "Invalid secret key or error during decryption!", 400
         # Sending image file to user as an attachment
         response = send_file(
             decrypted_image_bytes,
