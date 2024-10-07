@@ -1,4 +1,26 @@
 <!DOCTYPE html>
+<style>
+  #main-container {
+    display: block;
+  }
+  #divider {
+    opacity: 0.25;
+    margin: 20px;
+    border-bottom: var(--bs-border-width) solid rgb(222, 226, 230);
+  }
+
+  @media only screen and (min-width: 1024px) {
+    #main-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+    }
+    #divider {
+      border-left: var(--bs-border-width) solid rgb(222, 226, 230);
+      height: 600px;
+    }
+  }
+</style>
 <html lang="en" data-bs-theme="dark">
   <head>
     <title>Image Encryptor/Decryptor</title>
@@ -11,13 +33,7 @@
       <h1 class="bd-title">Image Encryptor/Decryptor</h1>
       <hr />
       <p class="alert alert-danger" hidden="true" id="error-display"></p>
-      <div
-        style="
-          display: flex;
-          flex-direction: row;
-          justify-content: space-around;
-        "
-      >
+      <div id="main-container">
         <div style="max-width: 500px">
           <h2>Encryption</h2>
           <div
@@ -71,14 +87,7 @@
             </div>
           </div>
         </div>
-        <div
-          style="
-            border-left: var(--bs-border-width) solid rgb(222, 226, 230);
-            opacity: 0.25;
-            height: 600px;
-            margin: 20px;
-          "
-        ></div>
+        <div id="divider"></div>
         <div style="max-width: 500px">
           <h2>Decryption</h2>
           <div style="display: flex; flex-direction: column">
